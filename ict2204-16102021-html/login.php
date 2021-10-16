@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<?php include('conn.php')?>
+<?php
+session_start();
+if (isset($_SESSION['user_id']) && $_SESSION['isloggedin'] == true) {
+    header('location: myreviews.php');
+}
+?>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+		<title>ICT2204 ReviewBase Login</title>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+		
+		<!-- Custom styling -->
+		<link href="assets/css/style.css?v=2.0" rel="stylesheet" />
+	</head>
+	<body>
+		
+		<?php
+		// define variables and set to empty values
+
+		$usernameErr = $passwordErr = "";
+		$username = $password = "";
+		
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			
+			$username = trim($_POST["username"]);
+			$password = $_POST["password"];
+			
+			$sql_login_authentication = "SELECT * FROM user_accounts WHERE username='".$username."' AND password = '".$password."'";
+			$result_check_account = mysqli_query($conn,$sql_login_authentication );
+			
+			$success = True;
+			
+
+			if (empty($username)) {
+				$usernameErr = "<div class=\"errorstyle\">Please enter a username</div>";
+				$success = False;
+			}
+			
+			if (empty($password)) {
+				$passwordErr = "<div class=\"errorstyle\">Please enter a password</div>";
+				$success = False;
+			}
+			
+			if(mysqli_num_rows($result_check_account) == 1) {
+				$row = mysqli_fetch_array($result_check_account);
+				$_SESSION['user_id'] = trim($row["user_id"]);
+				$_SESSION['isloggedin'] = true;
+				header("location: myreviews.php");                                                                                                                                                                                                                  
+			}
+			else{
+				$result_check_account_Err = "Your Login Name or Password is invalid";
+				$success = False;
+			}
+		}
+
+		?>
+
+		<?php
+		include 'navbar.php';
+		?>
+		
+		<section class="section-content padding-y bg">
+			<div class="container">
+				<div class="row">
+					<aside class="col-md-6">
+						<!-- ============================ COMPONENT LOGIN 1  ================================= -->
+						<?php
+						$url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+						//echo $url;
+						$url_components = parse_url($url);
+						//echo print_r($url_components);
+						if (array_key_exists('query', $url_components)) {
+							parse_str($url_components['query'], $query);
+							if ($query['usercreated'] == "yes"){
+								echo '
+									<div class="alert alert-success" role="alert">
+										Account created successfully!
+									</div>
+								';
+							}
+						}
+						?>
+						<div class="card">
+						  <div class="card-body">
+						  <h4 class="card-title mb-4">Sign in</h4>
+						  <p class="card-title mb-4">This website is a closed group. We are not accepting any new members for now. </p>
+						  <form action="#" method="post">
+							  <div class="form-group">
+								<!-- Website was created by USERNAME: User1 -->	
+								 <label>Username</label>
+								 <input type="text" class="form-control" placeholder="Username" name = "username">
+								 <?php echo $usernameErr;?>
+							  </div> <!-- form-group// -->
+							  <div class="form-group">
+								<label>Password</label>
+								<input type="password" class="form-control"  placeholder="Password" name = "password">
+                    			<?php echo $passwordErr;
+								if (!empty($result_check_account_Err)) {
+									echo $result_check_account_Err;
+								}
+								?>
+							  </div> <!-- form-group// -->
+							  <div class="form-group"> 
+								<label class="custom-control custom-checkbox"> <input type="checkbox" class="custom-control-input" checked=""> <div class="custom-control-label"> Remember </div> </label>
+							  </div> <!-- form-group form-check .// -->
+							  <div class="form-group">
+								  <button type="submit" name="submit" value="submit" class="btn btn-primary btn-block"> Login  </button>
+							  </div> <!-- form-group// -->    
+						  </form>
+						  </div> <!-- card-body.// -->
+						</div> <!-- card .// -->
+						<!-- ============================ COMPONENT LOGIN 1  END.// ================================= -->
+					</aside>
+				</div>
+			</div>
+		</section>
+	</body>
+</html>
