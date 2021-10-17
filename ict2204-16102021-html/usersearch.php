@@ -47,7 +47,7 @@
 							<div class="col-md-5 p-lg-5 mx-auto my-5">
 							<?php
 								if ($_SERVER["REQUEST_METHOD"] == "POST") {
-									include('conn.php');
+									include('usersearch-conn.php');
 									// Get product name from products page
 									$name = $_POST['user'];
 									
